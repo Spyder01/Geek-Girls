@@ -1,0 +1,6 @@
+fastapi
+numpy
+uvicorn
+tensorflow-cpu
+pydantic
+
