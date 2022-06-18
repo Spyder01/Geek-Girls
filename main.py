@@ -1,8 +1,14 @@
+import numpy as np
 from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 
+
 from services.Predict import get_model, predict
+from services.get_message import get_message
+
+
+
 
 
 app = FastAPI()
@@ -25,17 +31,29 @@ class Query(BaseModel):
     query: str
 
 
-@app.get('/')
-async def Index():
-    return {"message": "Hello World"}
+
+#app.mount("/", StaticFiles(directory="static", html=True), name="static")
 
 
 @app.post('/api/predict')
 async def Predict_Response(query: Query):
-    model = get_model()
+    
+    #prediction = predict(model, np.array("4 4 7 4 5 4 0 0 0 0 0 0 0 0 0 0 0".split (" ")).reshape (1, -1))
+  try:
+    res = get_message(query.query)
     return {
         "success": True,
         "data": {
-            predict(model, query.query)
+            "query": res
         }
     }
+  except Exception as e:
+    return {
+        "success": False,
+        "data": {
+            "error": str(e)
+        }
+    }
+
+
+

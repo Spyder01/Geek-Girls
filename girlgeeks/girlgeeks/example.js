@@ -1,29 +1,29 @@
 let menu = document.querySelector('#menu-bar');
 let navbar = document.querySelector('.navbar');
 
-menu.onclick = () =>{
+menu.onclick = () => {
     menu.classList.toggle('fa-times');
     navbar.classList.toggle('active');
 }
 
-window.onscroll = () =>{
+window.onscroll = () => {
     menu.classList.remove('fa-times');
     navbar.classList.remove('active');
 
-    if(window.scrollY > 60){
+    if (window.scrollY > 60) {
         document.querySelector('#scroll-top').classList.add('active');
     }
-    else{
+    else {
         document.querySelector('#scroll-top').classList.remove('active');
     }
 }
 
-function loader(){
+function loader() {
     document.querySelector('.loader-container').classList.add('fade-out');
 }
 
-function fadeOut(){
-    setInterval(loader,3000);
+function fadeOut() {
+    setInterval(loader, 3000);
 }
 window.onload = fadeOut();
 
@@ -86,11 +86,20 @@ firstBotMessage();
 
 // Retrieves the response
 function getHardResponse(userText) {
-    let botResponse = getBotResponse(userText);
-    let botHtml = '<p class="botText"><span>' + botResponse + '</span></p>';
-    $("#chatbox").append(botHtml);
-
-    document.getElementById("chat-bar-bottom").scrollIntoView(true);
+    getBotResponse(userText).then(botResponses =>
+        botResponses.forEach(botResponse => {
+            if (botResponse === Infinity) {
+                botResponse = "Oops, there's something wrong with my brain!";
+                let botHtml = '<p class="botText"><span>' + botResponse + '</span></p>';
+                $("#chatbox").append(botHtml);
+                document.getElementById("chat-bar-bottom").scrollIntoView(true);               
+            }
+            else if (botResponse != "") {
+                let botHtml = '<p class="botText"><span>' + botResponse + '</span></p>';
+                $("#chatbox").append(botHtml);
+                document.getElementById("chat-bar-bottom").scrollIntoView(true);
+            }
+        }));
 }
 
 //Gets the text text from the input box and processes it
@@ -147,14 +156,9 @@ $("#textInput").keypress(function (e) {
 
 
 
-function getBotResponse(input) {
-    if (input == "hello") {
-        return "Hello there!";
-    } else if (input == "goodbye") {
-        return "Talk to you later!";
-    } else {
-        return "Try asking something else!";
-    }
+async function getBotResponse(input) {
+    const res = await response(input, 'http://127.0.0.1:8000/api/predict');
+    return res;
 }
 
 
@@ -177,7 +181,7 @@ function getBotResponse(input) {
 
 
 
-const response = async (chat, url)=>{
+const response = async (chat, url) => {
 
     const query = {
         query: chat
@@ -192,13 +196,13 @@ const response = async (chat, url)=>{
     })
 
     const data = await response.json();
-    console.log (data)
+    console.log(data)
 
-    if (data.success){
+    if (data.success) {
         return data.data.query;
+    } else 
+    {
+        return [Infinity];
     }
-    
-}
 
-// response(string,"http://127.0.0.1:8000/api/predict").then()
-response ("sjbvjdfbvca", "http://127.0.0.1:8000/api/predict").then (data=>alert (data))
+}

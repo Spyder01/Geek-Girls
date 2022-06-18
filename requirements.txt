@@ -1,6 +1,7 @@
 fastapi
 numpy
 uvicorn
-tensorflow-cpu
 pydantic
-
+scikit-learn
+pandas
+fuzzywuzzy
